@@ -5,35 +5,30 @@
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
 name: Finlyt
-
 #we can create service if we have multiple images for deployment
 images:
   frontend:
     image:
       repository: savitapadarya/finlyt
       pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-      tag: "2fa3c0f3baac86a357a94e58589495019147a6dc"
-
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: "a2ad5d045ba87026f9e12e834486712d5142032b"
   Ollama:
     image:
       repository: ollama/ollama
       pullPolicy: IfNotPresent
       tag: "2fa3c0f3baac86a357a94e58589495019147a6dc"
-
   database:
     image:
       repository: mysql
       pullPolicy: IfNotPresent
       tag: "2fa3c0f3baac86a357a94e58589495019147a6dc"
-
 autoscaling:
   enabled: true
   minReplicas: 1
   maxReplicas: 4
   targetCPUUtilizationPercentage: 80
   targetMemoryUtilizationPercentage: 80
-
 ingress:
   enabled: true
   annotations:
@@ -42,5 +37,4 @@ ingress:
   hosts:
     - host: finlyt.example.com
       paths:
-        - / 
-        
+        - /
