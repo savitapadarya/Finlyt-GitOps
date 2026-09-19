@@ -13,19 +13,19 @@ images:
       repository: savitapadarya/finlyt
       pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-      tag: "latest"
+      tag: "2fa3c0f3baac86a357a94e58589495019147a6dc"
 
   Ollama:
     image:
       repository: ollama/ollama
       pullPolicy: IfNotPresent
-      tag: "latest"
+      tag: "2fa3c0f3baac86a357a94e58589495019147a6dc"
 
   database:
     image:
       repository: mysql
       pullPolicy: IfNotPresent
-      tag: "8.0"
+      tag: "2fa3c0f3baac86a357a94e58589495019147a6dc"
 
 autoscaling:
   enabled: true
