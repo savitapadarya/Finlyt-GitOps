@@ -1,0 +1,58 @@
+### Banking application services manifest file
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+  namespace: finlyt
+  labels:
+    app: {{ .Values.name }}_frontend
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30007
+  selector:
+    app: {{ .Values.name }}_frontend
+  type: NodePort
+
+---
+### Mysql services manifest file
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+  namespace: finlyt
+  labels:
+    app: {{ .Values.name }}_db
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
+  selector:
+    app: {{ .Values.name }}_db
+  type: ClusterIP
+
+---
+### Ollama Service Manifest file
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama-service
+  namespace: finlyt
+  labels:
+    app: {{.Values.name}}_ollama
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 11434
+      targetPort: 11434
+  selector:
+    app: {{.Values.name}}_ollama
+  type: ClusterIP
+
+

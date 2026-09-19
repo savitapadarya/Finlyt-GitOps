@@ -1,0 +1,216 @@
+{{- if .Values.ingress.enabled }}
+###Banking App manifest file for deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}_deployment
+  namespace: finlyt
+  labels:
+    app: {{ .Values.name }}_frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}_frontend
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}_frontend
+    spec:
+      initContainers:
+      - name: wait-for-database-service
+        image: busybox:1.36
+        command: ['sh', '-c', "until nslookup db-service.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for database; sleep 2; done"]
+      - name: wait-for-ollama-service
+        image: busybox:1.36
+        command: ['sh', '-c', "until nslookup ollama-service.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for ollama; sleep 2; done"]
+      containers:
+      - name: {{.Values.name}}-app
+        image: {{.Values.images.frontend.image.repository}}:{{.Values.images.frontend.image.tag}}
+        imagePullPolicy: {{.Values.images.frontend.image.pullPolicy}}
+        imagePullSecrets:
+        - name: dockerhub-secret
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "768Mi"
+            cpu: "500m"
+        envFrom:
+        - configMapRef:
+            name: myconfigmap
+        - secretRef:
+            name: secret-finlyt
+  
+---
+####Database Mysql  Deployment manifest file
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.name}}_db_deployment
+  namespace: finlyt
+  labels:
+    app: {{ .Values.name }}_db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}_db
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}_db
+    spec:
+      volumes:
+      - name: db-pv-volume
+        persistentVolumeClaim:
+          claimName: db-pvc-claim
+      containers:
+      - name: {{.Values.name}}-db
+        image: {{.Values.images.database.image.repository}}:{{.Values.images.database.image.tag}}
+        imagePullPolicy: {{.Values.images.database.image.pullPolicy}}
+        ports:
+        - containerPort: 3306
+        resources:
+          requests:
+            memory: "550Mi"
+            cpu: "250m"
+          limits:
+            memory: "700Mi"
+            cpu: "500m"
+        env:
+        - name: MYSQL_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: myconfigmap
+              key: MYSQL_DATABASE
+
+        - name: MYSQL_USER
+          valueFrom:
+            configMapKeyRef:
+              name: myconfigmap
+              key: MYSQL_USER
+
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret-finlyt
+              key: MYSQL_PASSWORD
+
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret-finlyt
+              key: MYSQL_ROOT_PASSWORD
+        volumeMounts:
+        - mountPath: "/var/lib/mysql"
+          name: db-pv-volume
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "mysqladmin ping -h 127.0.0.1 -u root -p$MYSQL_ROOT_PASSWORD --silent"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+           command:
+              - sh
+              - -c
+              - "mysqladmin ping -h 127.0.0.1 -u root -p$MYSQL_ROOT_PASSWORD --silent"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        startupProbe:
+          exec:
+            command:
+              - sh
+              - -c
+              - "mysqladmin ping -h 127.0.0.1 -u root -p$MYSQL_ROOT_PASSWORD --silent"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.name}}_ollama_deployment
+  namespace: finlyt
+  labels:
+    app: {{.Values.name}}_ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{.Values.name}}_ollama
+  template:
+    metadata:
+      labels:
+        app: {{.Values.name}}_ollama
+    spec:
+      volumes:
+      - name: ollama-pv-volume
+        persistentVolumeClaim:
+          claimName: ollama-pvc-claim
+      containers:
+      - name: ollama
+        image: {{.Values.images.Ollama.image.repository}}:{{.Values.images.Ollama.image.tag}}
+        imagePullPolicy: {{.Values.images.Ollama.image.pullPolicy}}
+        ports:
+        - containerPort: 11434
+        resources:
+          requests:
+              memory: "512Mi"
+              cpu: "100m"
+          limits:
+            memory: "2Gi"      # adjust based on which model(s) you're loading
+            cpu: "1000m"
+        envFrom:
+        - configMapRef:
+            name: myconfigmap
+        - secretRef:
+            name: secret-finlyt
+        volumeMounts:
+          - mountPath: "/root/.ollama"
+            name: ollama-pv-volume
+        livenessProbe:
+          exec:
+            command:
+              - sh
+              - -c
+              - "ollama list"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+           command:
+              - sh
+              - -c
+              - "ollama list"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        startupProbe:
+          exec:
+            command:
+              - sh
+              - -c
+              - "ollama list"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+{{- end }}
