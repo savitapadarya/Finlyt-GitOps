@@ -29,7 +29,7 @@ spec:
         image: {{.Values.images.frontend.image.repository}}:{{.Values.images.frontend.image.tag}}
         imagePullPolicy: {{.Values.images.frontend.image.pullPolicy}}
         imagePullSecrets:
-        - name: dockerhub-secret
+        - name: dockerhub-finlyt
         ports:
         - containerPort: 8080
         resources:
@@ -72,6 +72,8 @@ spec:
       - name: {{.Values.name}}-db
         image: {{.Values.images.database.image.repository}}:{{.Values.images.database.image.tag}}
         imagePullPolicy: {{.Values.images.database.image.pullPolicy}}
+        imagePullSecrets:
+        - name: dockerhub-finlyt
         ports:
         - containerPort: 3306
         resources:
@@ -166,6 +168,8 @@ spec:
       - name: ollama
         image: {{.Values.images.Ollama.image.repository}}:{{.Values.images.Ollama.image.tag}}
         imagePullPolicy: {{.Values.images.Ollama.image.pullPolicy}}
+        imagePullSecrets:
+        - name: dockerhub-finlyt
         ports:
         - containerPort: 11434
         resources:
