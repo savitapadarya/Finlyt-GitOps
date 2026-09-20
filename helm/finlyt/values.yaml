@@ -12,7 +12,7 @@ images:
       repository: savitapadarya/finlyt
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "a2ad5d045ba87026f9e12e834486712d5142032b"
+      tag: "e932848ed7c3efd06e8a6825b982a59a116a7563"
   Ollama:
     image:
       repository: ollama/ollama
@@ -38,7 +38,6 @@ ingress:
     - host: finlyt.example.com
       paths:
         - /
-
 service:
   type: NodePort
   port: 8080
