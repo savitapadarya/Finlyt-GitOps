@@ -10,12 +10,12 @@ spec:
   ports:
     - name: http
       protocol: TCP
-      port: 8080
-      targetPort: 8080
-      nodePort: 30007
+      port: {{ .Values.service.port }}
+      targetPort: {{.Values.service.targetPort }}
+      nodePort: {{ .Values.service.nodePort }}
   selector:
     app: {{ .Values.name }}_frontend
-  type: NodePort
+  type: {{ .Values.service.type }}
 
 ---
 ### Mysql services manifest file

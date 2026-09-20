@@ -4,7 +4,7 @@
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
-name: Finlyt
+name: finlyt
 #we can create service if we have multiple images for deployment
 images:
   frontend:
@@ -38,3 +38,9 @@ ingress:
     - host: finlyt.example.com
       paths:
         - /
+
+service:
+  type: NodePort
+  port: 8080
+  targetPort: 8080
+  nodePort: 30007

@@ -3,7 +3,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.name }}_deployment
+  name: {{ .Values.name }}-deployment
   namespace: finlyt
   labels:
     app: {{ .Values.name }}_frontend
@@ -50,7 +50,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Values.name}}_db_deployment
+  name: {{.Values.name}}-db-deployment
   namespace: finlyt
   labels:
     app: {{ .Values.name }}_db
@@ -144,7 +144,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Values.name}}_ollama_deployment
+  name: {{.Values.name}}-ollama-deployment
   namespace: finlyt
   labels:
     app: {{.Values.name}}_ollama
