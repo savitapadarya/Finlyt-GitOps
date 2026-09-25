@@ -12,7 +12,7 @@ images:
       repository: savitapadarya/finlyt
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "4122a6efa9acfade10b44062eda1cde93e09e235"
+      tag: "de499996771fa494376740650a0d93110279b6d7"
   Ollama:
     image:
       repository: ollama/ollama
